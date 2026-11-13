@@ -1,0 +1,37 @@
+name: PR 검사
+
+on:
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 코드 가져오기
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Node.js 설치
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: npm ci
+        run: npm ci
+
+      # 기존 lint 오류가 남아 있어서, 정리 전까지는 PR에서 바뀐 파일만 검사한다
+      - name: lint (바뀐 파일만)
+        shell: bash
+        run: |
+          git diff -z --name-only --diff-filter=ACMR HEAD^1 HEAD -- '*.js' '*.jsx' \
+            | xargs -0 -r npx eslint
+
+      - name: 빌드
+        run: npm run build
