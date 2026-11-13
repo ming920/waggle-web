@@ -7,6 +7,8 @@ on:
 
 jobs:
   deploy:
+    # fork에는 배포 시크릿이 없으므로 원본 레포에서만 배포
+    if: github.repository == 'Wagglex2/waggle-web'
     runs-on: ubuntu-latest # Github Actions가 우분투 가상 환경을 띄울거에요
 
     steps:
